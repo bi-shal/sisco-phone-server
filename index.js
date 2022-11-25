@@ -145,7 +145,7 @@ app.get("/user/:email", verifyToken,verifyAdmin, async (req, res) => {
 })
 
 
-// get admin api 
+// get admin api ---------------------------admin-api
 app.get('/user/admin/:email', async (req, res) => {
     try {
 
@@ -191,6 +191,20 @@ app.get('/user/buyer/:email', async (req, res) => {
         res.send({
             isBuyer: isBuyer
         })
+
+    } catch (error) {
+        console.log(error);
+    }
+})
+
+//----------------------------user
+app.post('/usersCreate', async (req, res) => {
+    try {
+
+        const userr = req.body;
+        console.log('userssssssss', userr);
+        const userss = await userCollection.insertOne(userr);
+        res.send(userss)
 
     } catch (error) {
         console.log(error);
