@@ -57,6 +57,29 @@ async function run (){
         const userCollection = client.db('allPhoneData').collection('userCategory')
 
 
+// verify admin
+
+async function verifyAdmin(req, res, next) {
+    const requester = req.decoded?.email;
+    // console.log('your crush mail', requester);
+    // console.log(`requester `, requester);
+    const requesterInfo = await userCollection.findOne({ email: requester })
+    // console.log(`requesterInfo `, requesterInfo);
+    const requesterRole = requesterInfo?.role;
+    console.log(`requesterRole `, requesterRole);
+    // if (requesterInfo?.role === 'admin') {
+    //     return next();
+    // }
+    if (!requesterInfo?.role === 'admin') {
+        return res.status(401).send({
+            message: `You are not admin`,
+            status: 401
+        })
+    }
+    return next();
+}
+
+
         app.get('/services', async(req,res) => {
             const query = {}
             const cursor = serviceCollection.find(query);
@@ -104,7 +127,7 @@ async function run (){
 
 
         // get single user
-app.get("/user/:email", verifyToken, async (req, res) => {
+app.get("/user/:email", verifyToken,verifyAdmin, async (req, res) => {
     try {
         const email = req.params.email;
         // console.log(`decode token`, req.decoded);
@@ -121,6 +144,58 @@ app.get("/user/:email", verifyToken, async (req, res) => {
     }
 })
 
+
+// get admin api 
+app.get('/user/admin/:email', async (req, res) => {
+    try {
+
+        const email = req.params.email;
+        // console.log(`email`, email);
+        const user = await userCollection.findOne({ email: email });
+        const isAdmin = user?.role === 'admin';
+        res.send({
+            isAdmin: isAdmin
+        })
+
+    } catch (error) {
+        console.log(error);
+    }
+})
+
+
+// get Seller api ------------------------------------seler
+app.get('/user/seler/:email', async (req, res) => {
+    try {
+
+        const email = req.params.email;
+        // console.log(`email`, email);
+        const user = await userCollection.findOne({ email: email });
+        const isSeler = user?.role === 'seler';
+        res.send({
+            isSeler: isSeler
+        })
+
+    } catch (error) {
+        console.log(error);
+    }
+})
+
+// get buyer api -------------------------------------buyer
+app.get('/user/buyer/:email', async (req, res) => {
+    try {
+
+        const email = req.params.email;
+        // console.log(`email`, email);
+        const user = await userCollection.findOne({ email: email });
+        const isBuyer = user?.role === 'buyer';
+        res.send({
+            isBuyer: isBuyer
+        })
+
+    } catch (error) {
+        console.log(error);
+    }
+})
 
 
 
