@@ -53,11 +53,13 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 async function run (){
     try{
-        const serviceCollection = client.db('allPhoneData').collection('CategoryData')
+        const addVitigeCollection = client.db('allPhoneData').collection('addVitige')
         const userCollection = client.db('allPhoneData').collection('userCategory')
+        const userRole = client.db('allPhoneData').collection('userRole')
         const categoryAll = client.db('allPhoneData').collection('category')
         const allProducts = client.db('allPhoneData').collection('allProduct')
         const productsCollection = client.db('allPhoneData').collection('formAllProduct')
+        const bookingsCollection = client.db('allPhoneData').collection('bookings')
 
 
 // verify admin
@@ -90,28 +92,75 @@ async function verifyAdmin(req, res, next) {
             res.send(category)
         })
 
-//ALL-PRODUCT-----------
-        // app.get('/products/:id', async (req,res) => {
-        //     const id = req.params.id;
-        //     console.log(id);
-        //     const query = allProducts.find(pro => pro.category == id);
-        //     console.log(query)
-        //     // const cursor = await allProduct.findOne(query);
-        //     // res.send(cursor)
-        // })
-
 //form-----------
         app.post('/products', async (req, res) => {
             const product = req.body;
+            // console.log(product)
             const products = await productsCollection.insertOne(product);
             res.send(products);
         });
 
+//myProduct---------asif
+
+
+app.get('/bookings/:email', async (req, res) => {
+    const email = req.params.email;
+    // console.log(email);
+    const query = { email: email };
+    // console.log(query);
+    const result = await productsCollection.find(query).toArray();
+    res.send(result);
+});
+//addVitige-collection
+app.post('/advertise', async (req, res) => {
+    const user = req.body;
+    // console.log(user);--------------
+    const addvige = await addVitigeCollection.insertOne(user);
+    res.send(addvige);
+});
+
+//getADDcard
+app.get('/addCard', async(req,res) => {
+    const query = {};
+    const users = await addVitigeCollection.find(query).toArray();
+    res.send(users)
+})
+//delete
+// app.delete('/delete/:id', async (req, res) => {
+//     const id = req.params.id;
+//     console.log(id)
+//     const query = {_id:id};
+//     const result = await addVitigeCollection.deleteOne(query);
+//     res.send(result);
+// });
+app.delete('/delete/:id', async (req, res) => {
+    const id = req.params.id;
+    // console.log(id)
+    const query = {_id:ObjectId(id)}
+    const result = await productsCollection.deleteOne(query);
+    res.send(result);
+});
+
+//myProduct---------asif
+
+//Shop-route-------------
+app.get('/shop', async(req,res) => {
+    const query = {};
+    const users = await productsCollection.find(query).toArray();
+    res.send(users)
+})
+
+//Shop-route-------------
+
+
+
+
+
         //user-role
         app.post('/usersCreate', async (req, res) => {
-            const product = req.body;
-            // console.log(product);
-            const userss = await userCollection.insertOne(product);
+            const user = req.body;
+            // console.log(user);--------------
+            const userss = await userCollection.insertOne(user);
             res.send(userss);
         });
 //user-role-----trying
@@ -121,67 +170,36 @@ async function verifyAdmin(req, res, next) {
         res.send(users)
     })
 
-    //email-role----------last
-    app.get('/user/:email', async (req,res) => {
-        const email =req.params.email;
-        console.log(email);
-        const filter = { email: email };
-        const result = await userCollection.find(use=> use.email === filter)
-        console.log(result);
-        res.send(result)
-    })
 
-        // app.get('/products/:email', async (req, res) => {
-        //     const email = req.params.email;
-        //     const query = { email: email };
-        //     const result = await productsCollection.find(query).toArray();
-        //     res.send(result);
-        //     // console.log(result);
-        // });
+    // })
+            // check role
+            app.get('/usersCreate/:email', async (req, res) => {
+                const email = req.params.email;
+                // console.log(email)
+                const query = { email: email };
+                const result = await userCollection.findOne(query);
+                res.send(result);
+                // console.log(result)
+            });
 
 
-        // app.get('/services', async(req,res) => {
-        //     const query = {}
-        //     const cursor = serviceCollection.find(query);
-        //     const services = await cursor.toArray();
-        //     // console.log(services)
-        //     res.send(services)
-        // });
+//Boking-collection-start
+app.post('/bookings', async (req, res) => {
+    const product = req.body;
+    const products = await bookingsCollection.insertOne(product);
+    res.send(products);
+});
 
-//token------------userPutDB------------------------
+app.get('/bookings/:email', async (req, res) => {
+    const email = req.params.email;
+    const query = { email: email };
+    // console.log(query);
+    const result = await bookingsCollection.find(query).toArray();
+    res.send(result);
+});
 
-        // app.put("/user/:email", async (req, res) => {
-        //     try {
-        //         const email = req.params.email;
-        //         console.log(email)
-        //         // check the req
-        //         console.log(req.body);
-        //         const user = req.body;
-        //         const filter = { email: email };
-        //         const options = { upsert: true };
-        //         const updateDoc = {
-        //             $set: user
-        //         }
-        //         const result = await userCollection.updateOne(filter, updateDoc, options);
-        
-        //         // token generate 
-        //         const token = jwt.sign(
-        //             { email: email },
-        //             process.env.ACCESS_TOKEN_SECRET,
-        //             { expiresIn: "60d" }
-        //         )
-        //         res.send({
-        //             status: "success",
-        //             message: "Token Created Successfully",
-        //             data: token
-        //         })
-        
-        
-        //     }
-        //     catch (err) {
-        //         console.log(err)
-        //     }
-        // })
+
+//Boking-collection-end
 
 
         // get single user
@@ -201,88 +219,6 @@ app.get("/user/:email", verifyToken,verifyAdmin, async (req, res) => {
         console.log(err)
     }
 })
-
-
-// get admin api ---------------------------admin-api
-// app.get('/user/admin/:email', async (req, res) => {
-//     try {
-
-//         const email = req.params.email;
-//         // console.log(`email`, email);
-//         const user = await userCollection.findOne({ email: email });
-//         const isAdmin = user?.role === 'admin';
-//         res.send({
-//             isAdmin: isAdmin
-//         })
-
-//     } catch (error) {
-//         console.log(error);
-//     }
-// })
-
-
-// get Seller api ------------------------------------seler
-// app.get('/user/seler/:email', async (req, res) => {
-//     try {
-
-//         const email = req.params.email;
-//         // console.log(`email`, email);
-//         const user = await userCollection.findOne({ email: email });
-//         const isSeler = user?.role === 'seler';
-//         res.send({
-//             isSeler: isSeler
-//         })
-
-//     } catch (error) {
-//         console.log(error);
-//     }
-// })
-
-// // get buyer api -------------------------------------buyer
-// app.get('/user/buyer/:email', async (req, res) => {
-//     try {
-
-//         const email = req.params.email;
-//         // console.log(`email`, email);
-//         const user = await userCollection.findOne({ email: email });
-//         const isBuyer = user?.role === 'buyer';
-//         res.send({
-//             isBuyer: isBuyer
-//         })
-
-//     } catch (error) {
-//         console.log(error);
-//     }
-// })
-
-// //----------------------------user---alamin
-// app.post('/usersCreate', async (req, res) => {
-//     try {
-
-//         const userr = req.body;
-//         console.log(userr);
-//         const loginUser = await userCollection.findOne({
-//             email:userr.email,
-//         });
-//         if(!loginUser){
-//             await userCollection.insertOne(userr);
-//         }
-//         res.status(200).send({
-//             msg:'reisTaion sucessfully'
-//         });
-
-//     } catch (error) {
-//         console.log(error);
-//     };
-
-// })
-
-//     app.get('/usersCreate', async(req,res) => {
-//         const query = {};
-//         const users = await userCollection.find(query).toArray();
-//         res.send(users)
-//     })
-// //----------------------------user---alamin
 
 
     }
