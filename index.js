@@ -60,6 +60,7 @@ async function run (){
         const allProducts = client.db('allPhoneData').collection('allProduct')
         const productsCollection = client.db('allPhoneData').collection('formAllProduct')
         const bookingsCollection = client.db('allPhoneData').collection('bookings')
+        const bookModal = client.db('allPhoneData').collection('bookModal')
 
 
 // verify admin
@@ -102,7 +103,6 @@ async function verifyAdmin(req, res, next) {
 
 //myProduct---------asif
 
-
 app.get('/bookings/:email', async (req, res) => {
     const email = req.params.email;
     // console.log(email);
@@ -112,9 +112,9 @@ app.get('/bookings/:email', async (req, res) => {
     res.send(result);
 });
 //addVitige-collection
-app.post('/advertise', async (req, res) => {
+app.post('/advertises', async (req, res) => {
     const user = req.body;
-    // console.log(user);--------------
+    console.log(user)
     const addvige = await addVitigeCollection.insertOne(user);
     res.send(addvige);
 });
@@ -151,6 +151,15 @@ app.get('/shop', async(req,res) => {
 })
 
 //Shop-route-------------
+
+//book-Modal------------
+app.post('/bookModal', async (req, res) => {
+    const user = req.body;
+    // console.log(user)
+    const userss = await bookModal.insertOne(user);
+    res.send(userss);
+});
+//book-Modal------------
 
 
 
