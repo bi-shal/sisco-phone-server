@@ -101,7 +101,7 @@ async function verifyAdmin(req, res, next) {
             res.send(products);
         });
 
-//myProduct---------asif
+//myProduct--------
 
 app.get('/bookings/:email', async (req, res) => {
     const email = req.params.email;
@@ -141,7 +141,7 @@ app.delete('/delete/:id', async (req, res) => {
     res.send(result);
 });
 
-//myProduct---------asif
+//myProduct--------
 
 //Shop-route-------------
 app.get('/shop', async(req,res) => {
@@ -161,14 +161,41 @@ app.post('/bookModal', async (req, res) => {
 });
 //book-Modal------------
 
+//myOrder------------------------------------------------
+app.get('/bookModal', async (req, res) => {
+    
+    // console.log(email)
+    const query = {};
+    const result = await bookModal.find(query).toArray();
+    console.log(result)
+    res.send(result);
+    // console.log(result)
+});
 
+//myOrder------------------------------
 
+//CateGory------------------------------------------------------------------------
+app.get("/api/category/:id", async (req, res) => {
+    const id = req.params.id;
+    //console.log(id);
+  
+    const category = await categoryCollection.findOne({
+      _id: ObjectId(id),
+    });
+    //console.log(category.category);
+  
+    const allProduct = await productCollection
+      .find({ category: category.category })
+      .toArray();
+    //console.log(allProduct);
+    res.status(200).send({ product: 'allProduct' })
+});
+//CateGory-----------------------------------------------------------------------
 
-
-        //user-role
+        //create-role
         app.post('/usersCreate', async (req, res) => {
             const user = req.body;
-            // console.log(user);--------------
+            console.log(user)
             const userss = await userCollection.insertOne(user);
             res.send(userss);
         });
@@ -182,14 +209,14 @@ app.post('/bookModal', async (req, res) => {
 
     // })
             // check role
-            app.get('/usersCreate/:email', async (req, res) => {
+         app.get('/userrole/:email', async (req, res) => {
                 const email = req.params.email;
                 // console.log(email)
                 const query = { email: email };
                 const result = await userCollection.findOne(query);
                 res.send(result);
                 // console.log(result)
-            });
+        });
 
 
 //Boking-collection-start
@@ -206,10 +233,6 @@ app.get('/bookings/:email', async (req, res) => {
     const result = await bookingsCollection.find(query).toArray();
     res.send(result);
 });
-
-
-//Boking-collection-end
-
 
         // get single user
 app.get("/user/:email", verifyToken,verifyAdmin, async (req, res) => {
