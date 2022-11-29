@@ -48,7 +48,6 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@clu
 // console.log(uri);
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
-//jwt-
 
 
 async function run (){
@@ -62,6 +61,20 @@ async function run (){
         const bookingsCollection = client.db('allPhoneData').collection('bookings')
         const bookModal = client.db('allPhoneData').collection('bookModal')
 
+
+// JWT
+// app.post('/jwt',async(req,res) => {
+//     const email = req.params.email;
+//     const query = {email: email};
+//     const user = await userCollection.findOne(query);
+//     if(user) {
+//         const token = jwt.sign({email}, process.env.ACCESS_TOKEN_SECRET,{
+//             expiresIn: "id",
+//         });
+//         return res.send({accessToken: token});
+//     }
+//     res.status(401).send({accessToken: 'Unauthorized user'});
+// });
 
 // verify admin
 
@@ -92,6 +105,12 @@ async function verifyAdmin(req, res, next) {
             const category = await cursor.toArray();
             res.send(category)
         })
+        app.get('/categoryForm/:category', async(req,res) => {
+            const category = req.params.category;
+            const query = {category:category};
+            const result = await productsCollection.find(query).toArray();
+            res.send(result)
+        })
 
 //form-----------
         app.post('/products', async (req, res) => {
@@ -114,7 +133,7 @@ app.get('/bookings/:email', async (req, res) => {
 //addVitige-collection
 app.post('/advertises', async (req, res) => {
     const user = req.body;
-    console.log(user)
+    // console.log(user)
     const addvige = await addVitigeCollection.insertOne(user);
     res.send(addvige);
 });
@@ -190,8 +209,9 @@ app.get("/api/category/:id", async (req, res) => {
     //console.log(allProduct);
     res.status(200).send({ product: 'allProduct' })
 });
-//CateGory-----------------------------------------------------------------------
 
+
+//CateGory-----------------------------------------------------------------------
         //create-role
         app.post('/usersCreate', async (req, res) => {
             const user = req.body;
@@ -199,19 +219,12 @@ app.get("/api/category/:id", async (req, res) => {
             const userss = await userCollection.insertOne(user);
             res.send(userss);
         });
-//user-role-----trying
-        app.get('/usersCreate', async(req,res) => {
-        const query = {};
-        const users = await userCollection.find(query).toArray();
-        res.send(users)
-    })
 
-
-    // })
-            // check role
+ 
+        // check role
          app.get('/userrole/:email', async (req, res) => {
                 const email = req.params.email;
-                // console.log(email)
+                console.log(email)
                 const query = { email: email };
                 const result = await userCollection.findOne(query);
                 res.send(result);
@@ -225,6 +238,8 @@ app.post('/bookings', async (req, res) => {
     const products = await bookingsCollection.insertOne(product);
     res.send(products);
 });
+
+
 
 app.get('/bookings/:email', async (req, res) => {
     const email = req.params.email;
@@ -253,7 +268,7 @@ app.get("/user/:email", verifyToken,verifyAdmin, async (req, res) => {
 })
 
 
-    }
+}
     finally{
 
     }
