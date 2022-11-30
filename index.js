@@ -29,9 +29,9 @@ async function run (){
     try{
         const addVitigeCollection = client.db('allPhoneData').collection('addVitige')
         const userCollection = client.db('allPhoneData').collection('userCategory')
-        const userRole = client.db('allPhoneData').collection('userRole')
+        // const userRole = client.db('allPhoneData').collection('userRole')
         const categoryAll = client.db('allPhoneData').collection('category')
-        const allProducts = client.db('allPhoneData').collection('allProduct')
+        // const allProducts = client.db('allPhoneData').collection('allProduct')
         const productsCollection = client.db('allPhoneData').collection('formAllProduct')
         const bookingsCollection = client.db('allPhoneData').collection('bookings')
         const bookModal = client.db('allPhoneData').collection('bookModal')
@@ -164,7 +164,7 @@ app.get("/api/category/:id", async (req, res) => {
         // check role
          app.get('/userrole/:email', async (req, res) => {
                 const email = req.params.email;
-                console.log(email)
+                // console.log(email)
                 const query = { email: email };
                 const result = await userCollection.findOne(query);
                 res.send(result);
@@ -183,9 +183,10 @@ app.post('/bookings', async (req, res) => {
 
 app.get('/bookings/:email', async (req, res) => {
     const email = req.params.email;
+    
     const query = { email: email };
     // console.log(query);
-    const result = await bookingsCollection.find(query).toArray();
+    const result = await bookingsCollection.findOne(query).toArray();
     res.send(result);
 });
 
