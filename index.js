@@ -13,40 +13,15 @@ app.use(cors());
 app.use(express.json());
 
 
-// Verify Token
-function verifyToken(req, res, next) {
-    const authorizaion = req.headers.authorizaion;
-    // console.log('authorizaion', authorizaion);
-    if (!authorizaion) {
-        return res.status(401).send({
-            message: 'No valid Auth Headers',
-            status: 401
-        })
-    }
-    const token = authorizaion.split(" ")[1];
-    // console.log(token);
-
-    // verify the token
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-        if (err) {
-            return res.status(401).send({
-                message: `Invalid Token`,
-                status: 401
-            })
-        }
-        req.decoded = decoded;
-        // req.yourName = decoded;
-        // req.jwtverifiedToken = decoded;
-        return next();
-    })
-}
-
 
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.eubulyg.mongodb.net/?retryWrites=true&w=majority`;
 // console.log(uri);
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+
+
+
 
 
 
@@ -62,41 +37,6 @@ async function run (){
         const bookModal = client.db('allPhoneData').collection('bookModal')
 
 
-// JWT
-// app.post('/jwt',async(req,res) => {
-//     const email = req.params.email;
-//     const query = {email: email};
-//     const user = await userCollection.findOne(query);
-//     if(user) {
-//         const token = jwt.sign({email}, process.env.ACCESS_TOKEN_SECRET,{
-//             expiresIn: "id",
-//         });
-//         return res.send({accessToken: token});
-//     }
-//     res.status(401).send({accessToken: 'Unauthorized user'});
-// });
-
-// verify admin
-
-async function verifyAdmin(req, res, next) {
-    const requester = req.decoded?.email;
-    // console.log('your crush mail', requester);
-    // console.log(`requester `, requester);
-    const requesterInfo = await userCollection.findOne({ email: requester })
-    // console.log(`requesterInfo `, requesterInfo);
-    const requesterRole = requesterInfo?.role;
-    console.log(`requesterRole `, requesterRole);
-    // if (requesterInfo?.role === 'admin') {
-    //     return next();
-    // }
-    if (!requesterInfo?.role === 'admin') {
-        return res.status(401).send({
-            message: `You are not admin`,
-            status: 401
-        })
-    }
-    return next();
-}
 
 //CATEGORY--------------
         app.get('/category', async(req,res) => {
@@ -126,7 +66,7 @@ app.get('/bookings/:email', async (req, res) => {
     const email = req.params.email;
     // console.log(email);
     const query = { email: email };
-    // console.log(query);
+    
     const result = await productsCollection.find(query).toArray();
     res.send(result);
 });
@@ -215,7 +155,7 @@ app.get("/api/category/:id", async (req, res) => {
         //create-role
         app.post('/usersCreate', async (req, res) => {
             const user = req.body;
-            console.log(user)
+            // console.log(user)
             const userss = await userCollection.insertOne(user);
             res.send(userss);
         });
@@ -249,8 +189,8 @@ app.get('/bookings/:email', async (req, res) => {
     res.send(result);
 });
 
-        // get single user
-app.get("/user/:email", verifyToken,verifyAdmin, async (req, res) => {
+// get single user
+app.get("/user/:email", async (req, res) => {
     try {
         const email = req.params.email;
         // console.log(`decode token`, req.decoded);
